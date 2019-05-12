@@ -1,9 +1,0 @@
-eslint::eslint
-fast-cli::fast
-gatsby-cli::gatsby
-gulp-cli::gulp
-imageoptim-cli::imageOptim
-vue-cli::vue
-trash-cli::trash
-netlify-cli::netlify
-renamer::renamer
