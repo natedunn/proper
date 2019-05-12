@@ -12,3 +12,4 @@ shellcheck
 tree
 wget
 yarn
+zsh
