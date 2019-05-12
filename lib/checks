@@ -1,0 +1,56 @@
+check_bash_version() {
+    if ((BASH_VERSINFO[0] < 3))
+    then
+        print_error "Sorry, you need at least bash-3.0 to run this script."
+        exit 1
+    fi
+}
+
+get_os() {
+
+    local os=""
+    local kernelName=""
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    kernelName="$(uname -s)"
+
+    if [ "$kernelName" == "Darwin" ]; then
+        os="macOS"
+    elif [ "$kernelName" == "Linux" ] && [ -e "/etc/lsb-release" ]; then
+        os="ubuntu"
+    else
+        os="$kernelName"
+    fi
+
+    printf "%s" "$os"
+
+}
+
+get_os_version() {
+
+    local os=""
+    local version=""
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    os="$(get_os)"
+
+    if [ "$os" == "macOS" ]; then
+        version="$(sw_vers -productVersion)"
+    elif [ "$os" == "ubuntu" ]; then
+        version="$(lsb_release -d | cut -f2 | cut -d' ' -f2)"
+    fi
+
+    printf "%s" "$version"
+
+}
+
+check_internet_connection() {
+    if [ ping -q -w1 -c1 google.com &>/dev/null ]; then
+        print_error "Please check your internet connection";
+        exit 0
+    else
+        print_success "Internet connection";
+    fi
+}

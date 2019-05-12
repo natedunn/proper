@@ -1,0 +1,14 @@
+antigen
+composer
+git
+httpd
+mariadb
+mas
+nginx
+php
+php@7.1
+php@7.2
+shellcheck
+tree
+wget
+yarn

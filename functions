@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Import partials
+. lib/variables
+. lib/utilities
+. lib/text
+. lib/checks
+. lib/prompts
+. lib/dotfiles
+. lib/process
+. lib/installs
+

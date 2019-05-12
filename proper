@@ -1,0 +1,165 @@
+#!/usr/bin/env bash
+
+###############################################################################
+# ERROR: Let the user know if the script fails
+###############################################################################
+
+trap 'ret=$?; test $ret -ne 0 && printf "\n   \e[31m\033[0m  Reboot failed  \e[31m\033[0m\n" >&2; exit $ret' EXIT
+set -e
+
+###############################################################################
+# Check for required functions file
+###############################################################################
+
+if [ -e functions ]; then
+	cd "$(dirname "${BASH_SOURCE[0]}")" \
+		&& . "functions"
+else
+	printf "\n ⚠️  ./functions not found \n"
+	exit 1
+fi
+
+###############################################################################
+# CHECK: Bash version
+###############################################################################
+check_bash_version
+
+###############################################################################
+# Get in Formation!          http://patorjk.com/software/taag/ ( font: Script )
+###############################################################################
+start_message
+
+###############################################################################
+# CHECK: Internet
+###############################################################################
+chapter "Checking internet connection"
+check_internet_connection
+
+###############################################################################
+# PROMPT: Password
+###############################################################################
+chapter "Caching password"
+ask_for_sudo
+
+###############################################################################
+# PROMPT: SSH Key
+###############################################################################
+chapter 'Checking for SSH key'
+ssh_key_setup
+
+###############################################################################
+# INSTALL: Dependencies
+###############################################################################
+chapter "Installing Dependencies…"
+
+install_xcode
+install_oh_my_zsh
+install_node
+install_homebrew
+install_composer
+
+###############################################################################
+# INSTALL: brews
+###############################################################################
+if [ -e $cwd/manifest/brews ]; then
+	chapter "Installing Homebrew formulae…"
+
+	for brew in $(<$cwd/manifest/brews); do
+		install_brews $brew
+	done
+fi
+
+###############################################################################
+# UPDATE: Homebrew
+###############################################################################
+chapter "Updating Homebrew formulae…"
+brew update
+
+###############################################################################
+# INSTALL: casks
+###############################################################################
+if [ -e $cwd/manifest/casks ]; then
+	chapter "Installing apps via Homebrew…"
+
+	for cask in $(<$cwd/manifest/casks); do
+	    install_application_via_brew $cask
+	done
+fi
+
+###############################################################################
+# INSTALL: Mac App Store Apps
+###############################################################################
+chapter "Installing apps from App Store…"
+if [ -x mas ]; then
+
+	print_warning "Please install mas-cli first: brew mas. Skipping."
+
+	else
+
+	if [ -e $cwd/manifest/apps ]; then
+		if mas_setup; then
+			# Workaround for associative array in Bash 3
+			# https://stackoverflow.com/questions/6047648/bash-4-associative-arrays-error-declare-a-invalid-option
+			for app in $(<$cwd/manifest/apps); do
+				KEY="${app%%::*}"
+				VALUE="${app##*::}"
+				install_application_via_app_store $KEY $VALUE
+			done
+		else
+			print_warning "Please signin to App Store first. Skipping."
+		fi
+	fi
+
+fi
+
+###############################################################################
+# CLEAN: Homebrew files
+###############################################################################
+chapter "Cleaning up Homebrew files…"
+brew cleanup -s 2> /dev/null
+print_success "Homebrew cleaned!"
+
+###############################################################################
+# INSTALL: npm packages
+###############################################################################
+if [ -e $cwd/manifest/npm ]; then
+	chapter "Installing npm packages…"
+
+	for pkg in $(<$cwd/manifest/npm); do
+		KEY="${pkg%%::*}"
+		VALUE="${pkg##*::}"
+		install_npm_packages $KEY $VALUE
+	done
+fi
+
+###############################################################################
+# INSTALL: composer
+###############################################################################
+if [ -e $cwd/manifest/composer ]; then
+	chapter "Installing Composer Packages…"
+
+	for packages in $(<$cwd/manifest/composer); do
+		install_composer_packages $packages
+	done
+fi
+
+
+###############################################################################
+# OPTIONAL: Customizations
+###############################################################################
+chapter "Custom Scripts"
+if [ -f "$HOME/.reboot-custom" ]; then
+	if ask "Do you want to add hot sauce?" Y; then
+		. "$HOME/.reboot-custom";
+		printf "\n  Custom scripts found. \n";
+	else
+		print_success_muted "Custom scripts declined. Skipped.";
+	fi
+else
+	print_warning "No ~/custom found. Skipping."
+fi
+
+###############################################################################
+# Finished
+###############################################################################
+end_message
