@@ -10,7 +10,6 @@ set -e
 ###############################################################################
 # Check for required functions file
 ###############################################################################
-
 if [ -e functions ]; then
 	cd "$(dirname "${BASH_SOURCE[0]}")" \
 		&& . "functions"
@@ -50,13 +49,12 @@ ssh_key_setup
 ###############################################################################
 # INSTALL: Dependencies
 ###############################################################################
-chapter "Installing Dependencies…"
-
-install_xcode
-install_oh_my_zsh
-install_node
-install_homebrew
-install_composer
+if [ -e $cwd/manifest/deps ]; then
+	chapter "Installing Dependencies…"
+	for dep in $(<$cwd/manifest/deps); do
+		install_dep_${dep}
+	done
+fi
 
 ###############################################################################
 # INSTALL: brews
