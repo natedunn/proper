@@ -4,7 +4,7 @@
 # ERROR: Let the user know if the script fails
 ###############################################################################
 
-trap 'ret=$?; test $ret -ne 0 && printf "\n   \e[31m\033[0m  Reboot failed  \e[31m\033[0m\n" >&2; exit $ret' EXIT
+trap 'ret=$?; test $ret -ne 0 && printf "\n\e[31m=====  The script has failed to run. Please try again.  =====\033[0m\n" >&2; exit $ret' EXIT
 set -e
 
 ###############################################################################
@@ -24,7 +24,7 @@ fi
 check_bash_version
 
 ###############################################################################
-# Get in Formation!          http://patorjk.com/software/taag/ ( font: Script )
+# Start Message!          http://patorjk.com/software/taag/ ( font: Script )
 ###############################################################################
 start_message
 
@@ -143,18 +143,18 @@ fi
 
 
 ###############################################################################
-# OPTIONAL: Customizations
+# OPTIONAL: Custom scripts
 ###############################################################################
 chapter "Custom Scripts"
-if [ -f "$HOME/.reboot-custom" ]; then
-	if ask "Do you want to add hot sauce?" Y; then
-		. "$HOME/.reboot-custom";
+if [ -f "$HOME/.proper-custom" ]; then
+	if ask "Do you run custom scripts?" Y; then
+		. "$HOME/.proper-custom";
 		printf "\n  Custom scripts found. \n";
 	else
 		print_success_muted "Custom scripts declined. Skipped.";
 	fi
 else
-	print_warning "No ~/custom found. Skipping."
+	print_warning "No custom scripts found in ~/proper-custom. Skipping."
 fi
 
 ###############################################################################
