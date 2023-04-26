@@ -12,7 +12,7 @@ install_dep_xcode() {
     fi
 
     if [ ! -d "$HOME/.bin/" ]; then
-        mkdir "$HOME/.bin"
+        _mkd "$HOME/.bin"
     fi
 }
 

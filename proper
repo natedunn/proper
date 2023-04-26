@@ -11,8 +11,8 @@ set -e
 # Check for required functions file
 ###############################################################################
 if [ -e functions ]; then
-	cd "$(dirname "${BASH_SOURCE[0]}")" \
-		&& . "functions"
+	cd "$(dirname "${BASH_SOURCE[0]}")" &&
+		. "functions"
 else
 	printf "\n ⚠️  ./functions not found \n"
 	exit 1
@@ -80,7 +80,7 @@ if [ -e $cwd/manifest/casks ]; then
 	chapter "Installing apps via Homebrew…"
 
 	for cask in $(<$cwd/manifest/casks); do
-	    install_application_via_brew $cask
+		install_application_via_brew $cask
 	done
 fi
 
@@ -92,7 +92,7 @@ if [ -x mas ]; then
 
 	print_warning "Please install mas-cli first: brew mas. Skipping."
 
-	else
+else
 
 	if [ -e $cwd/manifest/apps ]; then
 		if mas_setup; then
@@ -114,7 +114,7 @@ fi
 # CLEAN: Homebrew files
 ###############################################################################
 chapter "Cleaning up Homebrew files…"
-brew cleanup -s 2> /dev/null
+brew cleanup -s 2>/dev/null
 print_success "Homebrew cleaned!"
 
 ###############################################################################
@@ -141,17 +141,16 @@ if [ -e $cwd/manifest/composer ]; then
 	done
 fi
 
-
 ###############################################################################
 # OPTIONAL: Custom scripts
 ###############################################################################
 chapter "Custom Scripts"
 if [ -f "$HOME/.proper-custom" ]; then
 	if ask "Do you run custom scripts?" Y; then
-		. "$HOME/.proper-custom";
-		printf "\n  Custom scripts found. \n";
+		. "$HOME/.proper-custom"
+		printf "\n  Custom scripts found. \n"
 	else
-		print_success_muted "Custom scripts declined. Skipped.";
+		print_success_muted "Custom scripts declined. Skipped."
 	fi
 else
 	print_warning "No custom scripts found in ~/proper-custom. Skipping."
