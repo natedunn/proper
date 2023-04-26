@@ -46,6 +46,10 @@ print_success() {
     print_in_green "  [✓] $1\n"
 }
 
+print_noselect() {
+    print_muted "  [x] $1\n"
+}
+
 print_success_muted() {
     printf "  ${dim}[✓] $1${reset}\n" "$@"
 }

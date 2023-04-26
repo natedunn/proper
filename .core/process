@@ -18,7 +18,7 @@ copy_key_github() {
 }
 
 github_key_check() {
-    if ask "SSH key found. Enter it in Github?" Y; then
+    if ask "Would you to copy the selected key to use in Github?" Y; then
         copy_key_github
     else
         print_success "SSH key"
@@ -35,11 +35,25 @@ create_ssh_key() {
 }
 
 ssh_key_setup() {
-    local pub=$HOME/.ssh/id_rsa.pub
+    local array=($(find $HOME/.ssh -name '*.pub'))
+
+    echo "  [↓] SSH keys found:"
+    for i in ${array[@]}; do
+        # if first item
+        if [[ $i == ${array[0]} ]]; then
+            printf " "
+            print_success "${array[0]} (using this key)" | xargs
+        else
+            printf " "
+            print_noselect "${i}" | xargs
+        fi
+    done
+    local pub=${array[0]}
 
     if ! [[ -f $pub ]]; then
         create_ssh_key
     else
+        printf "\n"
         github_key_check
     fi
 }
