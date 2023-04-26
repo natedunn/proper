@@ -20,6 +20,7 @@ copy_key_github() {
 github_key_check() {
     if ask "Would you to copy the selected key to use in Github?" Y; then
         copy_key_github
+        touch $HOME/.proper/github_key_check
     else
         print_success "SSH key"
     fi
@@ -28,7 +29,6 @@ github_key_check() {
 create_ssh_key() {
     if ask "No SSH key found. Create one?" Y; then
         ssh-keygen -t rsa
-        github_key_check
     else
         return 0
     fi
@@ -37,7 +37,7 @@ create_ssh_key() {
 ssh_key_setup() {
     local array=($(find $HOME/.ssh -name '*.pub'))
 
-    echo "  [↓] SSH keys found:"
+    printf "  [↓] SSH keys found:\n"
     for i in ${array[@]}; do
         # if first item
         if [[ $i == ${array[0]} ]]; then
@@ -52,18 +52,25 @@ ssh_key_setup() {
 
     if ! [[ -f $pub ]]; then
         create_ssh_key
-    else
-        printf "\n"
+    fi
+
+    printf "\n"
+    printf "  [↓] Copy SSH key to Github:\n"
+
+    if ! [[ -f $HOME/.proper/github_key_check ]]; then
         github_key_check
+    else
+        print_success_muted "Already asked. Delete $HOME/.proper/github_key_check to ask again."
     fi
 }
 
 mas_setup() {
-    if mas account >/dev/null; then
-        return 0
-    else
-        return 1
-    fi
+    print_warning "Proper is unable to check if you are signed into the App Store. This is due to API restrictions from Apple."
+    # if mas account >/dev/null; then
+    #     return 0
+    # else
+    #     return 1
+    # fi
 }
 
 gem_install_or_update() {

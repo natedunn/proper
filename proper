@@ -35,6 +35,12 @@ chapter "Checking internet connection"
 check_internet_connection
 
 ###############################################################################
+# CHECK: Proper dir
+###############################################################################
+# chapter "Checking for Proper directory"
+check_proper_dir
+
+###############################################################################
 # PROMPT: Password
 ###############################################################################
 chapter "Caching password"
@@ -49,39 +55,54 @@ ssh_key_setup
 ###############################################################################
 # INSTALL: Dependencies
 ###############################################################################
-if [ -e $cwd/manifest/deps ]; then
-	chapter "Installing Dependencies"
+chapter "Installing Dependencies"
+if [ -s $cwd/manifest/deps ]; then
+
 	for dep in $(<$cwd/manifest/deps); do
 		install_dep_${dep}
 	done
+else
+	print_success_muted "Nothing to install"
 fi
 
 ###############################################################################
 # INSTALL: brews
 ###############################################################################
-if [ -e $cwd/manifest/brews ]; then
-	chapter "Installing Homebrew packages"
+chapter "Installing Homebrew packages"
+if [ -s $cwd/manifest/brews ]; then
 
 	for brew in $(<$cwd/manifest/brews); do
 		install_brews $brew
 	done
+else
+	print_success_muted "Nothing to install"
 fi
 
 ###############################################################################
 # UPDATE: Homebrew
 ###############################################################################
 chapter "Updating Homebrew"
-brew update
+var=$(brew update 2>&1)
+if [[ $var == *"Already up-to-date"* ]]; then
+	print_success_muted "Homebrew already up-to-date"
+else
+	printf "  [↓] Homebrew outdated. Updating:\n"
+	print_muted "    $var\n"
+	print_success "Homebrew updated!"
+fi
 
 ###############################################################################
 # INSTALL: casks
 ###############################################################################
-if [ -e $cwd/manifest/casks ]; then
-	chapter "Installing casks with Homebrew"
+chapter "Installing casks with Homebrew"
+if [ -s $cwd/manifest/casks ]; then
 
 	for cask in $(<$cwd/manifest/casks); do
 		install_application_via_brew $cask
 	done
+
+else
+	print_success_muted "Nothing to install"
 fi
 
 ###############################################################################
@@ -94,66 +115,74 @@ if [ -x mas ]; then
 
 else
 
-	if [ -e $cwd/manifest/apps ]; then
-		if mas_setup; then
-			# Workaround for associative array in Bash 3
-			# https://stackoverflow.com/questions/6047648/bash-4-associative-arrays-error-declare-a-invalid-option
-			for app in $(<$cwd/manifest/apps); do
-				KEY="${app%%::*}"
-				VALUE="${app##*::}"
-				install_application_via_app_store $KEY $VALUE
-			done
-		else
-			print_warning "Please signin to App Store first. Skipping."
-		fi
+	if [ -s $cwd/manifest/mas ]; then
+		mas_setup
+
+		for app in $(<$cwd/manifest/mas); do
+			KEY="${app%%::*}"
+			VALUE="${app##*::}"
+			install_application_via_app_store $KEY $VALUE
+		done
 	fi
 
+	print_success_muted "Nothing to install"
 fi
 
 ###############################################################################
 # CLEAN: Homebrew files
 ###############################################################################
 chapter "Cleaning up Homebrew files"
-brew cleanup -s 2>/dev/null
-print_success "Homebrew cleaned!"
+brew_clean=$(brew cleanup -s)
+if [[ $brew_clean == *"Nothing to do"* ]]; then
+	print_success_muted "Homebrew files already clean"
+else
+	if [[ -z $brew_clean ]]; then
+		print_muted "    $brew_clean\n"
+	fi
+	print_success_muted "Homebrew files cleaned!"
+fi
+# print_success_muted "Homebrew cleaned"
 
 ###############################################################################
 # INSTALL: npm packages
 ###############################################################################
-if [ -e $cwd/manifest/npm ]; then
-	chapter "Installing npm packages"
+chapter "Installing npm packages"
+if [ -s $cwd/manifest/npm ]; then
 
 	for pkg in $(<$cwd/manifest/npm); do
 		KEY="${pkg%%::*}"
 		VALUE="${pkg##*::}"
 		install_npm_packages $KEY $VALUE
 	done
+else
+	print_success_muted "Nothing to install"
 fi
 
 ###############################################################################
 # INSTALL: composer
 ###############################################################################
-if [ -e $cwd/manifest/composer ]; then
-	chapter "Installing Composer Packages"
-
+chapter "Installing Composer Packages"
+if [ -s $cwd/manifest/composer ]; then
 	for packages in $(<$cwd/manifest/composer); do
 		install_composer_packages $packages
 	done
+else
+	print_success_muted "Nothing to install"
 fi
 
 ###############################################################################
 # OPTIONAL: Custom scripts
 ###############################################################################
 chapter "Custom Scripts"
-if [ -f "$HOME/.proper-custom" ]; then
-	if ask "Found custom scripts at "$HOME/.proper-custom". Would like you like run this file?" Y; then
-		. "$HOME/.proper-custom"
+if [ -f "$HOME/.proper/custom" ]; then
+	if ask "Found custom scripts at "$HOME/.proper/custom". Would like you like run this file?" Y; then
+		. "$HOME/.proper/custom"
 		printf "\n  Custom scripts found. \n"
 	else
 		print_success_muted "Custom scripts declined. Skipped."
 	fi
 else
-	print_warning "No custom scripts found in ~/proper-custom. Skipping."
+	print_success_muted "No custom scripts found in "$HOME/.proper-custom". Skipping."
 fi
 
 ###############################################################################
