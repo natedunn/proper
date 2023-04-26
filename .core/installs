@@ -17,10 +17,10 @@ install_dep_xcode() {
 }
 
 install_dep_oh_my_zsh() {
-    if [[ $SHELL != /bin/zsh ]] ; then
+    if [[ $SHELL != /bin/zsh ]]; then
         step "Installing (Oh My) Zsh…"
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-            print_success "Using Zsh $ZSH_VERSION!"
+        print_success "Using Zsh $ZSH_VERSION!"
     else
         print_success_muted "(Oh My) Zsh already installed. Skipping."
     fi
@@ -75,10 +75,10 @@ install_dep_composer() {
 install_brews() {
     if test ! "$(brew list | grep $brew)"; then
         echo_install "Installing $brew"
-		brew install $brew >/dev/null
-		print_in_green "${bold}✓ installed!${normal}\n"
-	else
-		print_success_muted "$brew already installed. Skipped."
+        brew install $brew >/dev/null
+        print_in_green "${bold}✓ installed!${normal}\n"
+    else
+        print_success_muted "$brew already installed. Skipped."
     fi
 }
 
@@ -88,25 +88,25 @@ install_application_via_brew() {
         brew cask install $cask --appdir=/Applications >/dev/null
         print_in_green "${bold}✓ installed!${normal}\n"
     else
-    	print_success_muted "$cask already installed. Skipped."
+        print_success_muted "$cask already installed. Skipped."
     fi
 }
 
 install_application_via_app_store() {
-	if ! mas list | grep $1 &> /dev/null; then
-		echo_install "Installing $2"
-		mas install $1 >/dev/null
-		print_in_green "${bold}✓ installed!${normal}\n"
-	else
-		print_success_muted "$2 already installed. Skipped."
-	fi
+    if ! mas list | grep $1 &>/dev/null; then
+        echo_install "Installing $2"
+        mas install $1 >/dev/null
+        print_in_green "${bold}✓ installed!${normal}\n"
+    else
+        print_success_muted "$2 already installed. Skipped."
+    fi
 }
 
 install_composer_packages() {
     if [ ! -d "$HOME/.composer/vendor/$1" ]; then
         echo_install "Installing $1"
         composer global require $1 -q
-		print_in_green "${bold}✓ installed!${normal}\n"
+        print_in_green "${bold}✓ installed!${normal}\n"
     else
         composer global update $1 -q
         print_success_muted "$1 already installed & up-to-date."
@@ -114,11 +114,11 @@ install_composer_packages() {
 }
 
 install_npm_packages() {
-	if [[ $(cli_is_installed $2) == 0 ]]; then
-		echo_install "Installing $1"
-		npm install $1 -g --silent
-		print_in_green "${bold}✓ installed!${normal}\n"
-	else
-		print_success_muted "$1 already installed. Skipped."
-	fi
+    if [[ $(cli_is_installed $2) == 0 ]]; then
+        echo_install "Installing $1"
+        npm install $1 -g --silent
+        print_in_green "${bold}✓ installed!${normal}\n"
+    else
+        print_success_muted "$1 already installed. Skipped."
+    fi
 }
