@@ -9,10 +9,10 @@ cli_is_installed() {
 }
 
 copy_key_github() {
-    inform 'Public key copied! Paste into Github…'
+    inform 'Public key copied! Paste into Github'
     [[ -f $pub ]] && cat $pub | pbcopy
     open 'https://github.com/account/ssh'
-    read -p "   ✦  Press enter to continue…"
+    read -p "   ✦  Press enter to continue"
     print_success "SSH key"
     return
 }
