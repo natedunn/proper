@@ -53,3 +53,9 @@ check_internet_connection() {
         print_success "Internet connection"
     fi
 }
+
+check_proper_dir() {
+    if [ ! -d "$HOME/.proper" ]; then
+        mkdir "$HOME/.proper"
+    fi
+}
