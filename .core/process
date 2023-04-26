@@ -1,0 +1,90 @@
+# return 1 if global command line program installed, else 0
+cli_is_installed() {
+    # set to 1 initially
+    local return_=1
+    # set to 0 if not found
+    type $1 >/dev/null 2>&1 || { local return_=0; }
+    # return value
+    echo "$return_"
+}
+
+copy_key_github() {
+    inform 'Public key copied! Paste into Github'
+    [[ -f $pub ]] && cat $pub | pbcopy
+    open 'https://github.com/account/ssh'
+    read -p "   ✦  Press enter to continue"
+    print_success "SSH key"
+    return
+}
+
+github_key_check() {
+    if ask "Would you to copy the selected key to use in Github?" Y; then
+        copy_key_github
+        touch $HOME/.proper/github_key_check
+    else
+        print_success "SSH key"
+    fi
+}
+
+create_ssh_key() {
+    if ask "No SSH key found. Create one?" Y; then
+        ssh-keygen -t rsa
+    else
+        return 0
+    fi
+}
+
+ssh_key_setup() {
+    local array=($(find $HOME/.ssh -name '*.pub'))
+
+    printf "  [↓] SSH keys found:\n"
+    for i in ${array[@]}; do
+        # if first item
+        if [[ $i == ${array[0]} ]]; then
+            printf " "
+            print_success "${array[0]} (using this key)" | xargs
+        else
+            printf " "
+            print_noselect "${i}" | xargs
+        fi
+    done
+    local pub=${array[0]}
+
+    if ! [[ -f $pub ]]; then
+        create_ssh_key
+    fi
+
+    printf "\n"
+    printf "  [↓] Copy SSH key to Github:\n"
+
+    if ! [[ -f $HOME/.proper/github_key_check ]]; then
+        github_key_check
+    else
+        print_success_muted "Already asked. Delete $HOME/.proper/github_key_check to ask again."
+    fi
+}
+
+mas_setup() {
+    print_warning "Proper is unable to check if you are signed into the App Store. This is due to API restrictions from Apple."
+    # if mas account >/dev/null; then
+    #     return 0
+    # else
+    #     return 1
+    # fi
+}
+
+gem_install_or_update() {
+    if gem list "$1" --installed >/dev/null; then
+        gem update "$@"
+    else
+        gem install "$@"
+        rbenv rehash
+    fi
+}
+
+# The releases are returned in the format
+# {"id":3622206,"tag_name":"hello-1.0.0.11",…}
+# we have to extract the tag_name.
+get_github_version() {
+    echo $1 | sed -e 's/.*"tag_name":"\([^"]*\)".*/\1/'
+}

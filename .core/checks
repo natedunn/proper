@@ -1,6 +1,5 @@
 check_bash_version() {
-    if ((BASH_VERSINFO[0] < 3))
-    then
+    if ((BASH_VERSINFO[0] < 3)); then
         print_error "Sorry, you need at least bash-3.0 to run this script."
         exit 1
     fi
@@ -47,10 +46,16 @@ get_os_version() {
 }
 
 check_internet_connection() {
-    if [ ping -q -w1 -c1 google.com &>/dev/null ]; then
-        print_error "Please check your internet connection";
+    if [ ping -q -w1 -c1 google.com ] &>/dev/null; then
+        print_error "Please check your internet connection"
         exit 0
     else
-        print_success "Internet connection";
+        print_success "Internet connection"
+    fi
+}
+
+check_proper_dir() {
+    if [ ! -d "$HOME/.proper" ]; then
+        mkdir "$HOME/.proper"
     fi
 }

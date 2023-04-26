@@ -46,6 +46,10 @@ print_success() {
     print_in_green "  [✓] $1\n"
 }
 
+print_noselect() {
+    print_muted "  [x] $1\n"
+}
+
 print_success_muted() {
     printf "  ${dim}[✓] $1${reset}\n" "$@"
 }
@@ -63,32 +67,38 @@ print_error() {
 }
 
 title() {
-    local fmt="$1"; shift
+    local fmt="$1"
+    shift
     printf "\n✦  ${bold}$fmt${normal}\n└─────────────────────────────────────────────────────○\n" "$@"
 }
 
 chapter() {
-    local fmt="$1"; shift
+    local fmt="$1"
+    shift
     printf "\n${bold}$((count++)). $fmt${normal}\n─────────────────────────────────────────────────────\n" "$@"
 }
 
 echo_install() {
-    local fmt="$1"; shift
+    local fmt="$1"
+    shift
     printf "  [↓] $fmt " "$@"
 }
 
 todo() {
-    local fmt="$1"; shift
+    local fmt="$1"
+    shift
     printf "  [ ] $fmt\n" "$@"
 }
 
 inform() {
-    local fmt="$1"; shift
+    local fmt="$1"
+    shift
     printf "   ✦  $fmt\n" "$@"
 }
 
 announce() {
-    local fmt="$1"; shift
+    local fmt="$1"
+    shift
     printf "○───✦ $fmt\n" "$@"
 }
 
@@ -112,11 +122,11 @@ start_message() {
  |  __/  | |    | (_) | | |_) | |  __/ | |
  |_|     |_|     \___/  | .__/   \___| |_|
                         |_|                  ${normal}${dim}
-╭───────────────────────────────────────────────────╮
-│ System Info:                                      │
-│ • OS: $(get_os) ($(get_os_version))                             │
-│ • BASH: $BASH ($BASH_VERSION)               │
-╰───────────────────────────────────────────────────╯${normal} \n"
+───────────────────────────────────────────────────
+ System Info:
+ • OS: $(get_os) ($(get_os_version))
+ • Shell: $SHELL ($($SHELL --version))
+───────────────────────────────────────────────────${normal} \n"
 }
 end_message() {
     printf "\n${green}
