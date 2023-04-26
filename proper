@@ -136,12 +136,11 @@ brew_clean=$(brew cleanup -s)
 if [[ $brew_clean == *"Nothing to do"* ]]; then
 	print_success_muted "Homebrew files already clean"
 else
-	if [[ -z $brew_clean ]]; then
+	if [[ -x $brew_clean ]]; then
 		print_muted "    $brew_clean\n"
 	fi
 	print_success_muted "Homebrew files cleaned!"
 fi
-# print_success_muted "Homebrew cleaned"
 
 ###############################################################################
 # INSTALL: npm packages
