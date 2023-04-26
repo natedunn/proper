@@ -18,19 +18,20 @@ copy_key_github() {
 }
 
 github_key_check() {
-	if ask "SSH key found. Enter it in Github?" Y; then
-		copy_key_github;
-	else
-		print_success "SSH key";
-	fi
+    if ask "SSH key found. Enter it in Github?" Y; then
+        copy_key_github
+    else
+        print_success "SSH key"
+    fi
 }
 
 create_ssh_key() {
-	if ask "No SSH key found. Create one?" Y; then
-		ssh-keygen -t rsa; github_key_check;
-	else
-		return 0;
-	fi
+    if ask "No SSH key found. Create one?" Y; then
+        ssh-keygen -t rsa
+        github_key_check
+    else
+        return 0
+    fi
 }
 
 ssh_key_setup() {
@@ -44,7 +45,7 @@ ssh_key_setup() {
 }
 
 mas_setup() {
-    if mas account > /dev/null; then
+    if mas account >/dev/null; then
         return 0
     else
         return 1
@@ -52,7 +53,7 @@ mas_setup() {
 }
 
 gem_install_or_update() {
-    if gem list "$1" --installed > /dev/null; then
+    if gem list "$1" --installed >/dev/null; then
         gem update "$@"
     else
         gem install "$@"

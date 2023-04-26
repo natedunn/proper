@@ -63,32 +63,38 @@ print_error() {
 }
 
 title() {
-    local fmt="$1"; shift
+    local fmt="$1"
+    shift
     printf "\n✦  ${bold}$fmt${normal}\n└─────────────────────────────────────────────────────○\n" "$@"
 }
 
 chapter() {
-    local fmt="$1"; shift
+    local fmt="$1"
+    shift
     printf "\n${bold}$((count++)). $fmt${normal}\n─────────────────────────────────────────────────────\n" "$@"
 }
 
 echo_install() {
-    local fmt="$1"; shift
+    local fmt="$1"
+    shift
     printf "  [↓] $fmt " "$@"
 }
 
 todo() {
-    local fmt="$1"; shift
+    local fmt="$1"
+    shift
     printf "  [ ] $fmt\n" "$@"
 }
 
 inform() {
-    local fmt="$1"; shift
+    local fmt="$1"
+    shift
     printf "   ✦  $fmt\n" "$@"
 }
 
 announce() {
-    local fmt="$1"; shift
+    local fmt="$1"
+    shift
     printf "○───✦ $fmt\n" "$@"
 }
 

@@ -1,102 +1,102 @@
 _print_in_color() {
-    printf "%b" \
-        "$(tput setaf "$2" 2> /dev/null)" \
-        "$1" \
-        "$(tput sgr0 2> /dev/null)"
+  printf "%b" \
+    "$(tput setaf "$2" 2>/dev/null)" \
+    "$1" \
+    "$(tput sgr0 2>/dev/null)"
 }
 
 _print_error_stream() {
-    while read -r line; do
-        print_in_red "     ↳ ERROR: $line\n"
-    done
+  while read -r line; do
+    print_in_red "     ↳ ERROR: $line\n"
+  done
 }
 
 _show_spinner() {
 
-    local -r FRAMES='/-\|'
+  local -r FRAMES='/-\|'
 
-    # shellcheck disable=SC2034
-    local -r NUMBER_OR_FRAMES=${#FRAMES}
+  # shellcheck disable=SC2034
+  local -r NUMBER_OR_FRAMES=${#FRAMES}
 
-    local -r CMDS="$2"
-    local -r MSG="$3"
-    local -r PID="$1"
+  local -r CMDS="$2"
+  local -r MSG="$3"
+  local -r PID="$1"
 
-    local i=0
-    local frameText=""
+  local i=0
+  local frameText=""
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # Note: In order for the Travis CI site to display
-    # things correctly, it needs special treatment, hence,
-    # the "is Travis CI?" checks.
+  # Note: In order for the Travis CI site to display
+  # things correctly, it needs special treatment, hence,
+  # the "is Travis CI?" checks.
 
-    if [ "$TRAVIS" != "true" ]; then
+  if [ "$TRAVIS" != "true" ]; then
 
-        # Provide more space so that the text hopefully
-        # doesn't reach the bottom line of the terminal window.
-        #
-        # This is a workaround for escape sequences not tracking
-        # the buffer position (accounting for scrolling).
-        #
-        # See also: https://unix.stackexchange.com/a/278888
+    # Provide more space so that the text hopefully
+    # doesn't reach the bottom line of the terminal window.
+    #
+    # This is a workaround for escape sequences not tracking
+    # the buffer position (accounting for scrolling).
+    #
+    # See also: https://unix.stackexchange.com/a/278888
 
-        printf "\n\n\n"
-        tput cuu 3
+    printf "\n\n\n"
+    tput cuu 3
 
-        tput sc
+    tput sc
 
-    fi
+  fi
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  # Display spinner while the commands are being executed.
+
+  while kill -0 "$PID" &>/dev/null; do
+
+    frameText=" [${FRAMES:i++%NUMBER_OR_FRAMES:1}] $MSG"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # Display spinner while the commands are being executed.
+    # Print frame text.
 
-    while kill -0 "$PID" &>/dev/null; do
+    if [ "$TRAVIS" != "true" ]; then
+      printf "%s\n" "$frameText"
+    else
+      printf "%s" "$frameText"
+    fi
 
-        frameText=" [${FRAMES:i++%NUMBER_OR_FRAMES:1}] $MSG"
+    sleep 0.2
 
-        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        # Print frame text.
+    # Clear frame text.
 
-        if [ "$TRAVIS" != "true" ]; then
-            printf "%s\n" "$frameText"
-        else
-            printf "%s" "$frameText"
-        fi
+    if [ "$TRAVIS" != "true" ]; then
+      tput rc
+    else
+      printf "\r"
+    fi
 
-        sleep 0.2
-
-        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-        # Clear frame text.
-
-        if [ "$TRAVIS" != "true" ]; then
-            tput rc
-        else
-            printf "\r"
-        fi
-
-    done
+  done
 
 }
 
 _kill_all_subprocesses() {
 
-    local i=""
+  local i=""
 
-    for i in $(jobs -p); do
-        kill "$i"
-        wait "$i" &> /dev/null
-    done
+  for i in $(jobs -p); do
+    kill "$i"
+    wait "$i" &>/dev/null
+  done
 
 }
 
 _set_trap() {
 
-    trap -p "$1" | grep "$2" &> /dev/null \
-        || trap '$2' "$1"
+  trap -p "$1" | grep "$2" &>/dev/null ||
+    trap '$2' "$1"
 
 }
 
@@ -106,18 +106,15 @@ _link_file() {
   local overwrite= backup= skip=
   local action=
 
-  if [ -f "$dst" -o -d "$dst" -o -L "$dst" ]
-  then
+  if [ -f "$dst" -o -d "$dst" -o -L "$dst" ]; then
 
-    if [ "$overwrite_all" == "false" ] && [ "$backup_all" == "false" ] && [ "$skip_all" == "false" ]
-    then
+    if [ "$overwrite_all" == "false" ] && [ "$backup_all" == "false" ] && [ "$skip_all" == "false" ]; then
 
       local currentSrc="$(readlink $dst)"
 
-      if [ "$currentSrc" == "$src" ]
-      then
+      if [ "$currentSrc" == "$src" ]; then
 
-        skip=true;
+        skip=true
 
       else
 
@@ -126,20 +123,25 @@ _link_file() {
         read -n 1 action
 
         case "$action" in
-          o )
-            overwrite=true;;
-          O )
-            overwrite_all=true;;
-          b )
-            backup=true;;
-          B )
-            backup_all=true;;
-          s )
-            skip=true;;
-          S )
-            skip_all=true;;
-          * )
-            ;;
+        o)
+          overwrite=true
+          ;;
+        O)
+          overwrite_all=true
+          ;;
+        b)
+          backup=true
+          ;;
+        B)
+          backup_all=true
+          ;;
+        s)
+          skip=true
+          ;;
+        S)
+          skip_all=true
+          ;;
+        *) ;;
         esac
 
       fi
@@ -150,26 +152,22 @@ _link_file() {
     backup=${backup:-$backup_all}
     skip=${skip:-$skip_all}
 
-    if [ "$overwrite" == "true" ]
-    then
+    if [ "$overwrite" == "true" ]; then
       rm -rf "$dst"
       print_in_green "\n      ✓ deleted $dst"
     fi
 
-    if [ "$backup" == "true" ]
-    then
+    if [ "$backup" == "true" ]; then
       mv "$dst" "${dst}.backup"
       print_in_green "\n      ✓ moved $dst to ${dst}.backup"
     fi
 
-    if [ "$skip" == "true" ]
-    then
+    if [ "$skip" == "true" ]; then
       printf "\n  ${dim}    ✓ $src already linked. Skipped.${reset}"
     fi
   fi
 
-  if [ "$skip" != "true" ]  # "false" or empty
-  then
+  if [ "$skip" != "true" ]; then # "false" or empty
     ln -s "$1" "$2"
     print_in_green "\n      ✓ linked $1 to $2"
   fi
@@ -177,73 +175,73 @@ _link_file() {
 
 _execute() {
 
-    local -r CMDS="$1"
-    local -r MSG="${2:-$1}"
-    local -r TMP_FILE="$(mktemp /tmp/XXXXX)"
+  local -r CMDS="$1"
+  local -r MSG="${2:-$1}"
+  local -r TMP_FILE="$(mktemp /tmp/XXXXX)"
 
-    local exitCode=0
-    local cmdsPID=""
+  local exitCode=0
+  local cmdsPID=""
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # If the current process is ended,
-    # also end all its subprocesses.
+  # If the current process is ended,
+  # also end all its subprocesses.
 
-    _set_trap "EXIT" "_kill_all_subprocesses"
+  _set_trap "EXIT" "_kill_all_subprocesses"
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # Execute commands in background
+  # Execute commands in background
 
-    eval "$CMDS" \
-        &> /dev/null \
-        2> "$TMP_FILE" &
+  eval "$CMDS" \
+    &>/dev/null \
+    2>"$TMP_FILE" &
 
-    cmdsPID=$!
+  cmdsPID=$!
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # Show a spinner if the commands
-    # require more time to complete.
+  # Show a spinner if the commands
+  # require more time to complete.
 
-    _show_spinner "$cmdsPID" "$CMDS" "$MSG"
+  _show_spinner "$cmdsPID" "$CMDS" "$MSG"
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # Wait for the commands to no longer be executing
-    # in the background, and then get their exit code.
+  # Wait for the commands to no longer be executing
+  # in the background, and then get their exit code.
 
-    wait "$cmdsPID" &> /dev/null
-    exitCode=$?
+  wait "$cmdsPID" &>/dev/null
+  exitCode=$?
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # Print output based on what happened.
+  # Print output based on what happened.
 
-    print_result $exitCode "$MSG"
+  print_result $exitCode "$MSG"
 
-    if [ $exitCode -ne 0 ]; then
-        _print_error_stream < "$TMP_FILE"
-    fi
+  if [ $exitCode -ne 0 ]; then
+    _print_error_stream <"$TMP_FILE"
+  fi
 
-    rm -rf "$TMP_FILE"
+  rm -rf "$TMP_FILE"
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    return $exitCode
+  return $exitCode
 
 }
 
 _mkd() {
-    if [ -n "$1" ]; then
-        if [ -e "$1" ]; then
-            if [ ! -d "$1" ]; then
-                print_error "$1 - a file with the same name already exists!"
-            else
-                printf "     ${dim}✓ $1 already exists. Skipped.${reset}\n"
-            fi
-        else
-            _execute "mkdir -p $1" "$1"
-        fi
+  if [ -n "$1" ]; then
+    if [ -e "$1" ]; then
+      if [ ! -d "$1" ]; then
+        print_error "$1 - a file with the same name already exists!"
+      else
+        printf "     ${dim}✓ $1 already exists. Skipped.${reset}\n"
+      fi
+    else
+      _execute "mkdir -p $1" "$1"
     fi
+  fi
 }
