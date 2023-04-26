@@ -4,7 +4,7 @@
 # ERROR: Let the user know if the script fails
 ###############################################################################
 
-trap 'ret=$?; test $ret -ne 0 && printf "\n\e[31m=====  The script has failed to run. Please try again.  =====\033[0m\n" >&2; exit $ret' EXIT
+trap 'ret=$?; test $ret -ne 0 && printf "\n\e[31m=====  Proper has failed to complete.  =====\033[0m\n" >&2; exit $ret' EXIT
 set -e
 
 ###############################################################################
@@ -50,7 +50,7 @@ ssh_key_setup
 # INSTALL: Dependencies
 ###############################################################################
 if [ -e $cwd/manifest/deps ]; then
-	chapter "Installing Dependencies…"
+	chapter "Installing Dependencies"
 	for dep in $(<$cwd/manifest/deps); do
 		install_dep_${dep}
 	done
@@ -60,7 +60,7 @@ fi
 # INSTALL: brews
 ###############################################################################
 if [ -e $cwd/manifest/brews ]; then
-	chapter "Installing Homebrew formulae…"
+	chapter "Installing Homebrew packages"
 
 	for brew in $(<$cwd/manifest/brews); do
 		install_brews $brew
@@ -70,14 +70,14 @@ fi
 ###############################################################################
 # UPDATE: Homebrew
 ###############################################################################
-chapter "Updating Homebrew formulae…"
+chapter "Updating Homebrew"
 brew update
 
 ###############################################################################
 # INSTALL: casks
 ###############################################################################
 if [ -e $cwd/manifest/casks ]; then
-	chapter "Installing apps via Homebrew…"
+	chapter "Installing casks with Homebrew"
 
 	for cask in $(<$cwd/manifest/casks); do
 		install_application_via_brew $cask
@@ -87,7 +87,7 @@ fi
 ###############################################################################
 # INSTALL: Mac App Store Apps
 ###############################################################################
-chapter "Installing apps from App Store…"
+chapter "Installing apps from App Store"
 if [ -x mas ]; then
 
 	print_warning "Please install mas-cli first: brew mas. Skipping."
@@ -113,7 +113,7 @@ fi
 ###############################################################################
 # CLEAN: Homebrew files
 ###############################################################################
-chapter "Cleaning up Homebrew files…"
+chapter "Cleaning up Homebrew files"
 brew cleanup -s 2>/dev/null
 print_success "Homebrew cleaned!"
 
@@ -121,7 +121,7 @@ print_success "Homebrew cleaned!"
 # INSTALL: npm packages
 ###############################################################################
 if [ -e $cwd/manifest/npm ]; then
-	chapter "Installing npm packages…"
+	chapter "Installing npm packages"
 
 	for pkg in $(<$cwd/manifest/npm); do
 		KEY="${pkg%%::*}"
@@ -134,7 +134,7 @@ fi
 # INSTALL: composer
 ###############################################################################
 if [ -e $cwd/manifest/composer ]; then
-	chapter "Installing Composer Packages…"
+	chapter "Installing Composer Packages"
 
 	for packages in $(<$cwd/manifest/composer); do
 		install_composer_packages $packages
@@ -146,7 +146,7 @@ fi
 ###############################################################################
 chapter "Custom Scripts"
 if [ -f "$HOME/.proper-custom" ]; then
-	if ask "Do you run custom scripts?" Y; then
+	if ask "Found custom scripts at "$HOME/.proper-custom". Would like you like run this file?" Y; then
 		. "$HOME/.proper-custom"
 		printf "\n  Custom scripts found. \n"
 	else

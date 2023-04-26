@@ -6,7 +6,7 @@ install_dep_xcode() {
     if type xcode-select >/dev/null && xcode-select --print-path >/dev/null; then
         print_success_muted "Xcode already installed. Skipping."
     else
-        step "Installing Xcode…"
+        step "Installing Xcode"
         xcode-select --install
         print_success "Xcode installed!"
     fi
@@ -18,7 +18,7 @@ install_dep_xcode() {
 
 install_dep_oh_my_zsh() {
     if [[ $SHELL != /bin/zsh ]]; then
-        step "Installing (Oh My) Zsh…"
+        step "Installing (Oh My) Zsh"
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
         print_success "Using Zsh $ZSH_VERSION!"
     else
@@ -28,10 +28,10 @@ install_dep_oh_my_zsh() {
 
 install_dep_node() {
     if [ -x nvm ]; then
-        step "Installing NVM…"
+        step "Installing NVM"
         curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
         print_success "NVM installed!"
-        step "Installing latest Node…"
+        step "Installing latest Node"
         nvm install node
         nvm use node
         nvm run node --version
@@ -44,7 +44,7 @@ install_dep_node() {
 
 install_dep_homebrew() {
     if ! [ -x "$(command -v brew)" ]; then
-        step "Installing Homebrew…"
+        step "Installing Homebrew"
         curl -fsS 'https://raw.githubusercontent.com/Homebrew/install/master/install' | ruby
         export PATH="/usr/local/bin:$PATH"
         print_success "Homebrew installed!"
@@ -53,7 +53,7 @@ install_dep_homebrew() {
     fi
 
     if brew list | grep -Fq brew-cask; then
-        step "Uninstalling old Homebrew-Cask…"
+        step "Uninstalling old Homebrew-Cask"
         brew uninstall --force brew-cask
         print_success "Homebrew-Cask uninstalled!"
     fi
@@ -61,7 +61,7 @@ install_dep_homebrew() {
 
 install_dep_composer() {
     if [[ $COMPOSER_IS_INSTALLED -ne 0 ]]; then
-        step "Installing (Oh My) Zsh…"
+        step "Installing (Oh My) Zsh"
         brew install composer
         print_success "Composer Installed."
     else
