@@ -10,13 +10,15 @@ set -e
 ###############################################################################
 # Check for required functions file
 ###############################################################################
-if [ -e functions ]; then
-	cd "$(dirname "${BASH_SOURCE[0]}")" &&
-		. "functions"
-else
-	printf "\n ⚠️  ./functions not found \n"
-	exit 1
-fi
+
+source ./.core/variables
+source ./.core/utilities
+source ./.core/text
+source ./.core/checks
+source ./.core/prompts
+source ./.core/dotfiles
+source ./.core/process
+source ./.core/installs
 
 ###############################################################################
 # CHECK: Bash version
@@ -37,7 +39,6 @@ check_internet_connection
 ###############################################################################
 # CHECK: Proper dir
 ###############################################################################
-# chapter "Checking for Proper directory"
 check_proper_dir
 
 ###############################################################################

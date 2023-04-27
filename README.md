@@ -1,6 +1,6 @@
 # Proper
 
-A shell script to setup a macOS laptop for design, development, and whatever else you need.
+A fancy bash script to globally install from NPM, Homebrew, Mac app store, and Composer.
 
 ## Usage
 
