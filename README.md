@@ -4,7 +4,7 @@ A fancy bash script to globally install from NPM, Homebrew, Mac app store, and C
 
 ## Usage
 
-Visit [official website](https://useproper.app/use) for information on how to use Proper.
+Visit [official website](https://proper.app) for information on how to use Proper.
 
 ## Acknowledgements
 
